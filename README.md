@@ -1,609 +1,317 @@
 
-# Academic React — DevFlix | React, NestJS, Prisma e PostgreSQL
+# Academic React — DevFlix
 
-Projeto desenvolvido durante a Unidade Curricular de **Programação Web 2 — Senac RJ**, utilizando **React, Vite, NestJS, TypeScript, Prisma ORM, PostgreSQL e Docker Compose**.
+Projeto acadêmico desenvolvido na Unidade Curricular de **Programação Web II — Senac RJ**, utilizando React, NestJS, TypeScript, Prisma ORM, PostgreSQL e Docker.
 
----
+## 1. Descrição
 
-# 1. Descrição
+O DevFlix é uma plataforma de cursos de programação inspirada na Netflix.
 
-O **DevFlix** é uma aplicação web inspirada na Netflix, voltada para a disponibilização de aulas gratuitas de programação.
+No Tutorial 02, desenvolvemos o frontend com React. No Tutorial 03, implementamos a API NestJS e a conexão com o PostgreSQL.
 
-O projeto foi desenvolvido em duas etapas:
+O **Tutorial 04 — Modelando Cursos e Aulas com Prisma** amplia a estrutura do banco de dados, adicionando os modelos Course e Lesson e implementando relacionamentos entre categorias, cursos e aulas.
 
-- **Tutorial 02:** criação da interface React, com catálogo de cursos, pesquisa, favoritos e reprodução de vídeos do YouTube.
-- **Tutorial 03:** desenvolvimento da infraestrutura backend utilizando NestJS, Prisma ORM, PostgreSQL e Docker Compose.
+## 2. Funcionalidades
 
-Nesta etapa, o backend permite verificar a conexão com o banco de dados e consultar as categorias cadastradas.
-
-A aplicação utiliza a seguinte arquitetura:
-
-```text
-React (Frontend)
-      |
-      | Interface web
-      v
-NestJS (API REST)
-      |
-      v
-Prisma ORM
-      |
-      v
-PostgreSQL
-      |
-      v
-Docker Container
-```
-
-O frontend ainda utiliza dados locais para apresentar os cursos. A infraestrutura backend foi preparada para permitir a integração entre as aplicações nas próximas atividades.
-
----
-
-# 2. Funcionalidades
-
-O projeto possui as seguintes funcionalidades:
-
-### Frontend — React
-
-- Interface inspirada na Netflix;
-- Catálogo de aulas de programação;
-- Organização por categorias;
-- Cards com informações dos cursos;
-- Pesquisa de aulas por título;
-- Sistema de favoritos;
+- Catálogo de cursos com React;
+- Pesquisa e favoritos;
 - Reprodução de vídeos do YouTube;
-- Interface responsiva.
-
-### Backend — NestJS
-
-- API REST desenvolvida com NestJS;
-- Organização em Modules, Controllers e Services;
+- API REST com NestJS;
+- Persistência com PostgreSQL;
 - Integração com Prisma ORM;
-- Banco de dados PostgreSQL;
-- Execução do PostgreSQL com Docker Compose;
-- Migration inicial do banco;
-- Cadastro de categorias;
-- Endpoint de verificação de saúde;
-- Endpoint de listagem de categorias;
-- Teste automatizado do HealthController.
+- Relacionamentos 1:N;
+- Migrations versionadas;
+- Seed automático de dados;
+- Consulta de cursos e aulas;
+- Validação de identificadores;
+- Tratamento de erros HTTP;
+- Testes automatizados com Vitest.
 
----
+## 3. Tecnologias
 
-# 3. Tecnologias Utilizadas
+- React e Vite
+- JavaScript e CSS
+- Node.js e TypeScript
+- NestJS
+- Prisma ORM 7
+- PostgreSQL 17
+- Docker Compose
+- Vitest
+- Git e GitHub
 
-- **React**
-- **Vite**
-- **JavaScript**
-- **HTML**
-- **CSS**
-- **Node.js**
-- **NestJS**
-- **TypeScript**
-- **Prisma ORM 7**
-- **PostgreSQL 17**
-- **Docker**
-- **Docker Compose**
-- **Vitest**
-- **npm**
-- **Git**
-- **GitHub**
-
----
-
-# 4. Arquitetura e Organização do Projeto
-
-O DevFlix utiliza uma arquitetura com frontend e backend separados.
+## 4. Arquitetura
 
 ```text
-Usuário
-   |
-   v
-React + Vite
-   |
-   | Catálogo e interface
-   v
-Frontend
-
-Backend REST
-   |
-   v
-NestJS Controller
-   |
-   v
-NestJS Service
-   |
-   v
-PrismaService
-   |
-   v
+Frontend React
+      |
+      v
+API REST NestJS
+      |
+      v
+Controllers
+      |
+      v
+Services
+      |
+      v
 Prisma ORM
-   |
-   v
+      |
+      v
 PostgreSQL
-   |
-   v
-Docker
 ```
 
-Responsabilidades:
+Nesta etapa, o catálogo React ainda utiliza dados locais. A API permite consultar os dados persistidos no PostgreSQL.
 
-- `React` — interface e interação com o usuário;
-- `NestJS` — gerenciamento da API REST;
-- `Controllers` — recebimento das requisições HTTP;
-- `Services` — implementação das regras e consultas;
-- `PrismaService` — conexão da aplicação com o banco;
-- `Prisma ORM` — acesso aos dados;
-- `PostgreSQL` — armazenamento das categorias;
-- `Docker Compose` — execução do banco em container.
+## 5. Modelagem do Banco de Dados
 
----
+A aplicação utiliza três entidades:
 
-# 5. Estrutura do Projeto
+```text
+Category (1)
+    |
+    | 1:N
+    v
+Course (N)
+    |
+    | 1:N
+    v
+Lesson (N)
+```
+
+### Category
+
+Armazena as categorias dos cursos.
+
+- id
+- name
+- slug
+- createdAt
+- updatedAt
+
+### Course
+
+Armazena os cursos e suas informações.
+
+- id
+- title
+- slug
+- description
+- thumbnail
+- published
+- categoryId
+- createdAt
+- updatedAt
+
+### Lesson
+
+Armazena as aulas pertencentes aos cursos.
+
+- id
+- title
+- description
+- videoId
+- position
+- courseId
+- createdAt
+- updatedAt
+
+## 6. Relacionamentos
+
+Uma categoria pode possuir vários cursos, enquanto cada curso pertence a uma categoria.
+
+Um curso pode possuir várias aulas, enquanto cada aula pertence a um curso.
+
+Foram utilizadas as seguintes restrições:
+
+- `onDelete: Restrict` impede excluir categorias que possuem cursos;
+- `onDelete: Cascade` remove as aulas associadas quando um curso é excluído;
+- `@@unique([courseId, position])` impede posições duplicadas no mesmo curso;
+- Índices para otimizar consultas por chaves estrangeiras.
+
+## 7. Estrutura do Projeto
 
 ```text
 academic-react/
 ├── src/
 │   ├── components/
-│   │   ├── Header.jsx
-│   │   ├── CourseCard.jsx
-│   │   ├── CourseSection.jsx
-│   │   └── VideoPlayer.jsx
 │   ├── data/
-│   │   └── courses.js
 │   ├── App.jsx
-│   ├── App.css
-│   └── main.jsx
-│
+│   └── App.css
 ├── backend/
 │   ├── prisma/
 │   │   ├── migrations/
-│   │   └── schema.prisma
-│   │
+│   │   ├── schema.prisma
+│   │   └── seed.ts
 │   ├── src/
-│   │   ├── generated/
-│   │   │   └── prisma/
 │   │   ├── prisma/
-│   │   │   ├── prisma.module.ts
-│   │   │   └── prisma.service.ts
 │   │   ├── health/
-│   │   │   ├── health.module.ts
-│   │   │   ├── health.controller.ts
-│   │   │   ├── health.service.ts
-│   │   │   └── health.controller.spec.ts
 │   │   ├── categories/
-│   │   │   ├── categories.module.ts
-│   │   │   ├── categories.controller.ts
-│   │   │   └── categories.service.ts
-│   │   ├── app.module.ts
-│   │   └── main.ts
-│   │
-│   ├── .env
-│   ├── prisma.config.ts
-│   ├── package.json
-│   └── tsconfig.json
-│
+│   │   ├── courses/
+│   │   └── app.module.ts
+│   ├── prisma7.config.ts
+│   └── package.json
 ├── docker-compose.yml
 ├── package.json
-├── package-lock.json
-├── index.html
 └── README.md
 ```
 
-O arquivo `.env` deve permanecer apenas no ambiente local, sem ser enviado ao GitHub.
+## 8. Instalação
 
----
-
-# 6. Pré-requisitos
-
-Antes de executar o projeto, é necessário possuir:
-
-- Node.js 24;
-- npm;
-- Git;
-- Docker Desktop com Docker Compose V2;
-- Visual Studio Code ou editor equivalente.
-
-O NestJS CLI pode ser executado por meio do `npx`, sem necessidade de instalação global.
-
----
-
-# 7. Instalação
-
-## 7.1 Clone o repositório
+Clone o repositório:
 
 ```bash
 git clone https://github.com/matheuspessoa14/academic-react.git
-```
-
-## 7.2 Acesse o projeto
-
-```bash
 cd academic-react
+git switch branch_20261110
 ```
 
-## 7.3 Acesse a branch da atividade
-
-```bash
-git switch branch_20261103
-```
-
-## 7.4 Instale as dependências do frontend
+Instale as dependências do frontend:
 
 ```bash
 npm install
 ```
 
-## 7.5 Instale as dependências do backend
+Instale as dependências do backend:
 
 ```bash
 cd backend
 npm install --legacy-peer-deps
 ```
 
-O parâmetro `--legacy-peer-deps` foi utilizado durante o desenvolvimento para contornar um conflito na resolução de dependências do npm.
+## 9. PostgreSQL com Docker
 
----
-
-# 8. Configuração do PostgreSQL
-
-O projeto utiliza PostgreSQL 17 executado em um container Docker.
-
-Na raiz do projeto, o arquivo `docker-compose.yml` configura:
-
-- Imagem PostgreSQL 17;
-- Banco `devflix_db`;
-- Usuário `devflix`;
-- Volume persistente;
-- Healthcheck do banco;
-- Mapeamento da porta local 5433 para a porta 5432 do container.
-
-## 8.1 Iniciar o banco
+O banco de dados utiliza PostgreSQL 17 através do Docker Compose.
 
 Na raiz do projeto:
 
 ```bash
 docker compose up -d
-```
-
-## 8.2 Verificar os containers
-
-```bash
 docker compose ps
 ```
 
-O PostgreSQL deverá aparecer em execução e com status saudável.
+A configuração local utiliza a porta `5433`, encaminhada para a porta `5432` do container.
 
-## 8.3 Acessar o PostgreSQL
+## 10. Variáveis de Ambiente
 
-```bash
-docker exec -it devflix-postgres psql -U devflix -d devflix_db
-```
-
-## 8.4 Testar a conexão
-
-```sql
-SELECT current_database();
-```
-
-Resultado esperado:
-
-```text
- current_database
-------------------
- devflix_db
-```
-
-Para sair:
-
-```text
-\q
-```
-
----
-
-# 9. Configuração das Variáveis de Ambiente
-
-Crie o arquivo `backend/.env`.
-
-Exemplo para desenvolvimento local:
+Crie o arquivo `backend/.env` com a configuração local:
 
 ```env
 DATABASE_URL="postgresql://devflix:devflix123@localhost:5433/devflix_db?schema=public"
 ```
 
-A porta `5433` foi utilizada porque a porta `5432` estava indisponível no ambiente Windows durante a configuração.
+As credenciais são apenas para desenvolvimento acadêmico.
 
-O arquivo `.env` contém informações específicas do ambiente e não deve ser publicado.
+O arquivo `.env` deve permanecer no `.gitignore`.
 
-Ele deve permanecer no `.gitignore`:
+## 11. Prisma ORM
 
-```gitignore
-.env
-```
+O Prisma realiza as consultas ao PostgreSQL através do PrismaService.
 
-As credenciais apresentadas são utilizadas apenas no ambiente acadêmico de desenvolvimento.
-
----
-
-# 10. Prisma ORM
-
-O Prisma ORM é responsável pela comunicação entre o backend NestJS e o PostgreSQL.
-
-O modelo utilizado nesta atividade é:
-
-```prisma
-model Category {
-  id        Int      @id @default(autoincrement())
-  name      String
-  slug      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-```
-
-A entidade `Category` representa as categorias de cursos do DevFlix.
-
-Campos:
-
-- `id` — identificador único;
-- `name` — nome da categoria;
-- `slug` — identificador textual único;
-- `createdAt` — data de criação;
-- `updatedAt` — data da última atualização.
-
-A comunicação com o banco segue o fluxo:
+Os modelos são definidos em:
 
 ```text
-Controller
-    |
-    v
-Service
-    |
-    v
-PrismaService
-    |
-    v
-Prisma Client
-    |
-    v
-PostgreSQL
+backend/prisma/schema.prisma
 ```
 
----
-
-# 11. Gerando o Prisma Client
-
-Após configurar o banco e o arquivo `.env`, acesse a pasta `backend`:
+Para validar o schema:
 
 ```bash
-cd backend
+npx prisma validate
 ```
 
-Execute:
-
-```bash
-npx prisma generate
-```
-
-O Prisma Client será gerado em:
-
-```text
-backend/src/generated/prisma/
-```
-
-Sempre que o schema for modificado, o Prisma Client deverá ser atualizado.
-
----
-
-# 12. Migrations
-
-Para criar e aplicar a migration inicial:
-
-```bash
-npx prisma migrate dev --name init
-```
-
-As migrations ficam armazenadas em:
-
-```text
-backend/prisma/migrations/
-```
-
-Para verificar o status:
-
-```bash
-npx prisma migrate status
-```
-
-Em um ambiente que já possui as migrations versionadas, elas também podem ser aplicadas com:
+Para aplicar as migrations existentes:
 
 ```bash
 npx prisma migrate deploy
 ```
 
----
+Para gerar o Prisma Client:
 
-# 13. Dados de Teste
+```bash
+npx prisma generate
+```
 
-Foram cadastradas três categorias no banco de dados:
+As migrations implementadas até esta atividade são:
 
-| ID | Nome | Slug |
-| --- | --- | --- |
-| 1 | Desenvolvimento Frontend | frontend |
-| 2 | Desenvolvimento Backend | backend |
-| 3 | Banco de Dados | banco-de-dados |
+- `init` — criação da entidade Category;
+- `add_courses_lessons` — criação das entidades Course e Lesson.
 
-Os registros foram inseridos por meio do Prisma Studio.
+## 12. Seed do Banco de Dados
 
-Para abrir:
+O seed permite cadastrar automaticamente as categorias, cursos e aulas.
+
+Execute na pasta backend:
+
+```bash
+npx prisma db seed
+```
+
+O script utiliza `upsert()` para criar ou atualizar registros, evitando duplicações de cursos e aulas nas execuções seguintes.
+
+Para visualizar os dados:
 
 ```bash
 npx prisma studio
 ```
 
-O Prisma Studio permite consultar e editar os registros da tabela `Category`.
+## 13. Dados Cadastrados
 
-Os IDs apresentados correspondem aos registros do ambiente utilizado durante o desenvolvimento e podem variar em outra instalação.
+Foram utilizados três cursos:
 
----
+| Curso | Categoria | Aulas |
+| --- | --- | --- |
+| React para Iniciantes | Desenvolvimento Frontend | 2 |
+| Node.js para Iniciantes | Desenvolvimento Backend | 1 |
+| Fundamentos de SQL | Banco de Dados | 1 |
 
-# 14. PrismaService
+Total de registros do seed:
 
-O `PrismaService` disponibiliza o Prisma Client para os módulos da aplicação NestJS.
+- 3 categorias;
+- 3 cursos;
+- 4 aulas.
 
-Foi utilizado o adapter PostgreSQL:
+## 14. Módulo Courses
 
-```ts
-import { PrismaPg } from '@prisma/adapter-pg';
-```
+Foi criado o módulo Courses no NestJS.
 
-A conexão utiliza a variável de ambiente:
+O CoursesService utiliza o Prisma Client para consultar os cursos.
 
-```ts
-const databaseUrl =
-  configService.getOrThrow<string>('DATABASE_URL');
-```
+A consulta `findMany()` recupera todos os cursos, incluindo suas categorias e aulas.
 
-O adapter é configurado com:
+O método `findUnique()` permite recuperar um curso específico por ID.
 
-```ts
-const adapter = new PrismaPg({
-  connectionString: databaseUrl,
-});
-```
+O parâmetro `include` permite carregar os relacionamentos, e `orderBy` organiza as aulas por posição.
 
-O serviço também utiliza:
-
-- `OnModuleInit` — estabelece a conexão;
-- `OnModuleDestroy` — encerra a conexão.
-
-O `PrismaModule` foi definido como global para permitir a utilização do PrismaService em outros módulos.
-
----
-
-# 15. HealthModule
-
-O HealthModule verifica a comunicação entre a aplicação e o banco de dados.
-
-O endpoint implementado é:
-
-```http
-GET /health
-```
-
-O HealthService executa:
-
-```ts
-await this.prisma.$queryRaw`SELECT 1`;
-```
-
-Essa consulta verifica se o PostgreSQL está respondendo.
-
-Quando a conexão está disponível, a aplicação retorna informações sobre seu estado.
-
----
-
-# 16. CategoriesModule
-
-O CategoriesModule é responsável pela consulta das categorias cadastradas no PostgreSQL.
-
-O endpoint implementado é:
-
-```http
-GET /categories
-```
-
-O CategoriesService utiliza o Prisma:
-
-```ts
-return this.prisma.category.findMany({
-  select: {
-    id: true,
-    name: true,
-    slug: true,
-  },
-  orderBy: {
-    id: 'asc',
-  },
-});
-```
-
-A consulta retorna as categorias em ordem crescente de ID.
-
----
-
-# 17. Endpoints
+## 15. Endpoints
 
 | Método | Endpoint | Descrição |
 | --- | --- | --- |
-| `GET` | `/` | Retorna a mensagem inicial do NestJS |
-| `GET` | `/health` | Verifica a conexão da API com o banco |
-| `GET` | `/categories` | Lista as categorias cadastradas |
+| GET | `/health` | Verifica a conexão com o banco |
+| GET | `/categories` | Lista as categorias |
+| GET | `/courses` | Lista os cursos com categorias e aulas |
+| GET | `/courses/:id` | Consulta um curso por ID |
 
-A API utiliza a porta `3000`.
+A API utiliza:
 
----
+```text
+http://localhost:3000
+```
 
-# 18. Exemplos de Requisição e Resposta
-
-## 18.1 Health Check
-
-Requisição:
+Exemplos:
 
 ```http
-GET http://localhost:3000/health
+GET http://localhost:3000/courses
+GET http://localhost:3000/courses/1
 ```
 
-Exemplo de resposta:
+Erros tratados:
 
-```json
-{
-  "status": "ok",
-  "application": "DevFlix API",
-  "database": "connected",
-  "timestamp": "2026-11-03T18:00:00.000Z"
-}
-```
+- HTTP 404 — curso inexistente;
+- HTTP 400 — identificador inválido.
 
-O campo `timestamp` é gerado dinamicamente.
+## 16. Executando a Aplicação
 
-## 18.2 Listar categorias
-
-Requisição:
-
-```http
-GET http://localhost:3000/categories
-```
-
-Resposta:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Desenvolvimento Frontend",
-    "slug": "frontend"
-  },
-  {
-    "id": 2,
-    "name": "Desenvolvimento Backend",
-    "slug": "backend"
-  },
-  {
-    "id": 3,
-    "name": "Banco de Dados",
-    "slug": "banco-de-dados"
-  }
-]
-```
-
----
-
-# 19. Execução do Projeto
-
-Para executar frontend e backend, utilize terminais separados.
-
-## Terminal 1 — PostgreSQL
+### Banco de dados
 
 Na raiz do projeto:
 
@@ -611,44 +319,76 @@ Na raiz do projeto:
 docker compose up -d
 ```
 
-## Terminal 2 — Backend NestJS
+### Backend
 
 ```bash
 cd backend
 npm run start:dev
 ```
 
-A API estará disponível em:
+API:
 
 ```text
 http://localhost:3000
 ```
 
-## Terminal 3 — Frontend React
+### Frontend
 
-Na raiz do projeto:
+Em outro terminal, na raiz do projeto:
 
 ```bash
 npm run dev
 ```
 
-O frontend estará disponível normalmente em:
+Frontend:
 
 ```text
 http://localhost:5173
 ```
 
-A integração do catálogo React com a API poderá ser desenvolvida nas próximas atividades.
+## 17. Testes Automatizados
 
----
+Os testes utilizam Vitest e mocks do Prisma.
 
-# 20. Build
+Foram implementados testes para:
 
-Para verificar a compilação do frontend:
+- Listagem de cursos;
+- Consulta de curso por ID;
+- Tratamento de curso inexistente.
+
+Também foram preservados os testes dos módulos anteriores.
+
+Execute:
 
 ```bash
-npm run build
+cd backend
+npm run test
 ```
+
+Resultado obtido:
+
+```text
+Test Files  3 passed (3)
+Tests       5 passed (5)
+```
+
+Todos os cinco testes foram aprovados.
+
+## 18. Testes dos Relacionamentos
+
+Foram realizadas consultas SQL diretamente no PostgreSQL para verificar as associações entre cursos, categorias e aulas.
+
+A consulta confirmou:
+
+```text
+Fundamentos de SQL       | Banco de Dados           | 1 aula
+Node.js para Iniciantes  | Desenvolvimento Backend  | 1 aula
+React para Iniciantes    | Desenvolvimento Frontend | 2 aulas
+```
+
+Os relacionamentos estão funcionando conforme a modelagem definida.
+
+## 19. Build
 
 Para verificar a compilação do backend:
 
@@ -657,157 +397,53 @@ cd backend
 npm run build
 ```
 
-Os projetos devem compilar sem erros antes do envio da atividade.
-
----
-
-# 21. Testes Realizados
-
-Durante o desenvolvimento, foram realizados testes da infraestrutura e dos endpoints.
-
-Foram verificados:
-
-```text
-GET /
-GET /health
-GET /categories
-```
-
-Também foram testados:
-
-- Inicialização do PostgreSQL pelo Docker;
-- Conexão com o banco `devflix_db`;
-- Criação da migration inicial;
-- Geração do Prisma Client;
-- Cadastro das categorias;
-- Consulta dos registros pelo Prisma Studio;
-- Comunicação entre NestJS, Prisma e PostgreSQL;
-- Compilação da aplicação;
-- Teste automatizado do HealthController.
-
-Para executar os testes automatizados:
+Para compilar o frontend, execute na raiz:
 
 ```bash
-cd backend
-npm run test
+npm run build
 ```
 
-O teste do HealthController utiliza um mock do HealthService e não depende da conexão real com PostgreSQL.
+## 20. Conceitos Estudados
 
-A conexão real foi verificada por meio do endpoint `/health`.
+- Modelagem de bancos relacionais;
+- Relacionamentos um para muitos;
+- Chaves primárias e estrangeiras;
+- Integridade referencial;
+- Prisma ORM;
+- Prisma Migrate;
+- Prisma Seed;
+- Métodos `upsert`, `findMany` e `findUnique`;
+- Consultas com `include`;
+- APIs REST com NestJS;
+- Controllers e Services;
+- Testes automatizados.
 
----
-
-# 22. Conceitos Estudados
-
-Nesta atividade foram estudados:
-
-- Desenvolvimento de APIs REST;
-- Arquitetura cliente-servidor;
-- Separação de frontend e backend;
-- NestJS;
-- Modules, Controllers e Services;
-- Injeção de dependência;
-- TypeScript;
-- ORM;
-- Prisma Client;
-- PostgreSQL;
-- Docker Compose;
-- Containers;
-- Persistência de dados;
-- Migrations;
-- Variáveis de ambiente;
-- Health Check;
-- Endpoints HTTP;
-- Testes automatizados;
-- Separação de responsabilidades.
-
----
-
-# 23. Arquitetura Antes e Depois
-
-## Tutorial 02 — React
-
-Inicialmente, o DevFlix utilizava um catálogo armazenado diretamente em JavaScript.
-
-```text
-React
-  |
-  v
-courses.js
-  |
-  v
-Catálogo de cursos
-```
-
-## Tutorial 03 — Backend
-
-Nesta atividade, foi implementada uma infraestrutura para persistência e consulta de categorias.
-
-```text
-Cliente HTTP
-    |
-    v
-NestJS Controller
-    |
-    v
-NestJS Service
-    |
-    v
-PrismaService
-    |
-    v
-Prisma ORM
-    |
-    v
-PostgreSQL
-```
-
-O catálogo React ainda permanece utilizando os dados locais. O backend está preparado para futuras integrações.
-
----
-
-# 24. Versionamento e Organização das Branches
-
-O projeto utiliza Git e GitHub para controle de versão.
+## 21. Versionamento
 
 Repositório:
 
-```text
 https://github.com/matheuspessoa14/academic-react
-```
-
-Organização:
 
 | Branch | Atividade |
 | --- | --- |
-| `main` | Tutorial 02 — DevFlix React |
-| `branch_20261103` | Tutorial 03 — NestJS, PostgreSQL, Docker e Prisma |
+| main | Tutorial 02 — React DevFlix |
+| branch_20261103 | Tutorial 03 — NestJS, Docker e Prisma |
+| branch_20261110 | Tutorial 04 — Modelagem de Cursos e Aulas |
 
-A branch `main` mantém a implementação inicial do frontend.
+Cada tutorial é desenvolvido em uma branch específica, preservando as versões anteriores.
 
-A branch `branch_20261103` contém a evolução da aplicação com a infraestrutura backend.
+## 22. Autor
 
-As atividades são desenvolvidas em branches independentes para preservar a organização dos tutoriais da disciplina.
+**Nome:** Matheus Pessoa Telles de Oliveira
 
----
+**Unidade Curricular:** Programação Web II
 
-# 25. Autor
-
-**Nome:** Matheus Pessoa Telles de Oliveira  
-**Unidade Curricular:** Programação Web 2  
 **Instituição:** Senac RJ
 
-GitHub:
+**GitHub:** https://github.com/matheuspessoa14
 
-```text
-https://github.com/matheuspessoa14
-```
+## 23. Licença e Uso Acadêmico
 
----
+Projeto desenvolvido para fins acadêmicos na Unidade Curricular de Programação Web II — Senac RJ.
 
-# 26. Licença e Uso Acadêmico
-
-Projeto desenvolvido para fins acadêmicos na Unidade Curricular de **Programação Web 2 — Senac RJ**.
-
-O código poderá ser utilizado para avaliação e acompanhamento acadêmico durante o curso.
+O código poderá ser utilizado para avaliação e acompanhamento das atividades da disciplina.
